@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQI Widget</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .widget {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .widget button {
+            padding: 10px 20px;
+        }
+        .widget .aqi {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget">
+        <h2>AQI Widget</h2>
+        <button onclick="getAQI()">Get AQI for Salt Lake City, UT</button>
+        <div class="aqi" id="aqi"></div>
+    </div>
+
+    <script>
+        async function getAQI() {
+            const apiKey = '9dec4739-c9e3-44ed-ab3a-e7b56e02bb0e';
+            const city = 'Salt Lake City';
+            const state = 'Utah';
+            const country = 'USA';
+            const url = `https://api.airvisual.com/v2/city?city=${city}&state=${state}&country=${country}&key=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const aqi = data.data.current.pollution.aqius;
+                document.getElementById('aqi').innerText = `AQI: ${aqi}`;
+            } catch (error) {
+                document.getElementById('aqi').innerText = 'Error fetching data';
+                console.error('Error fetching AQI data:', error);
+            }
+        }
+    </script>
+</body>
+</html>
