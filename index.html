@@ -89,12 +89,9 @@
                 const aqi = data.data.current.pollution.aqius;
                 const mainPollutant = data.data.current.pollution.mainus;
 
-                // Check the exact structure for wind and humidity
-                console.log('Wind Data:', data.data.current.wind);
-                console.log('Weather Data:', data.data.current.weather);
-
-                const windSpeed = data.data.current.wind?.ws ? Math.round(data.data.current.wind.ws) : 'N/A'; // Round MPH
-                const windDirection = data.data.current.wind?.wd || 'N/A';
+                // Corrected extraction of wind speed and direction from the weather object
+                const windSpeed = data.data.current.weather?.ws ? Math.round(data.data.current.weather.ws) : 'N/A'; // Round MPH
+                const windDirection = data.data.current.weather?.wd || 'N/A';
                 const humidity = data.data.current.weather?.hu || 'N/A';
 
                 // Update AQI
