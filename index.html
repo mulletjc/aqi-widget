@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Air Quality Widget</title>
+    <title>AQI Widget</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,123 +22,59 @@
             text-align: center;
             width: 300px;
         }
-        .info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .info img {
-            width: 24px; /* Higher resolution icons */
-            height: 24px;
-            margin-right: 10px;
-        }
-        .info .text {
-            font-size: 18px;
-        }
-        .error {
-            font-size: 18px;
-            color: red;
-            margin-top: 20px;
+        .icon {
+            width: 40px; /* Adjust as needed */
+            height: auto;
+            vertical-align: middle;
         }
         .aqi-number {
             font-size: 48px;
             font-weight: bold;
             margin: 20px 0;
         }
+        .description {
+            font-size: 22px; /* Slightly larger text */
+            color: #000;
+        }
+        .error {
+            font-size: 18px;
+            color: red;
+            margin-top: 20px;
+        }
+        .info {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .info img {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="widget">
-        <!-- AQI Section -->
         <div class="info">
-            <img src="https://img.icons8.com/ios/50/000000/gauge.png" alt="AQI Icon" id="aqi-icon">
-            <div class="text" id="aqi">Loading...</div>
+            <img src="https://img.icons8.com/ios/40/000000/air-quality.png" class="icon" id="aqi-icon" alt="AQI Icon">
+            <div id="aqi" class="aqi-number">Loading...</div>
         </div>
-        <!-- Wind Speed Section -->
+        <div id="main-pollutant" class="info">Loading...</div>
         <div class="info">
-            <img src="https://img.icons8.com/ios/50/000000/wind.png" alt="Wind Speed Icon" id="wind-icon">
-            <div class="text" id="wind">Loading...</div>
-            <img src="https://img.icons8.com/ios/50/000000/long-arrow-up.png" id="wind-dir" alt="Wind Direction Icon">
+            <img src="https://img.icons8.com/ios/40/000000/wind.png" class="icon" alt="Wind Speed Icon">
+            <div id="wind-speed">Loading...</div>
+            <div id="wind-direction" style="display: inline-block; width: 20px; height: 20px; border: 2px solid #000; border-radius: 50%; transform: rotate(0deg);"></div>
         </div>
-        <!-- Humidity Section -->
         <div class="info">
-            <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity Icon" id="humidity-icon">
-            <div class="text" id="humidity">Loading...</div>
+            <img src="https://img.icons8.com/ios/40/000000/humidity.png" class="icon" alt="Humidity Icon">
+            <div id="humidity">Loading...</div>
         </div>
         <div id="error" class="error"></div>
     </div>
 
     <script>
-        async function getAirQuality() {
+        async function getAQI() {
             const apiKey = '9dec4739-c9e3-44ed-ab3a-e7b56e02bb0e';
             const city = 'Salt Lake City';
             const state = 'Utah';
             const country = 'USA';
-            const url = `https://api.airvisual.com/v2/city?city=${city}&state=${state}&country=${country}&key=${apiKey}`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                // Log data for debugging
-                console.log('API Response:', data);
-
-                if (data.status !== 'success') {
-                    throw new Error(data.data.message || 'Unknown error');
-                }
-
-                const aqi = data.data.current.pollution.aqius;
-                const aqiElement = document.getElementById('aqi');
-                aqiElement.innerText = aqi;
-
-                // Set AQI color based on value
-                let color;
-                if (aqi <= 50) {
-                    color = 'green';
-                } else if (aqi <= 100) {
-                    color = '#FFBF00'; // Slightly darker yellow
-                } else if (aqi <= 150) {
-                    color = 'orange';
-                } else if (aqi <= 200) {
-                    color = 'red';
-                } else if (aqi <= 300) {
-                    color = 'purple';
-                } else {
-                    color = 'maroon';
-                }
-                aqiElement.style.color = color;
-
-                // Display main pollutant
-                const pollutant = data.data.current.pollution.mainus || 'N/A'; // Adjust if necessary
-                const pollutantElement = document.getElementById('pollutant');
-                pollutantElement.innerText = pollutant;
-
-                // Wind Speed and Direction
-                const windSpeed = data.data.current.weather.windspeed || 'N/A'; // Ensure key names match API response
-                const windDirection = data.data.current.weather.wind_dir || 0; // Ensure key names match API response
-                document.getElementById('wind').innerText = `${windSpeed} MPH`;
-                document.getElementById('wind-dir').style.transform = `rotate(${windDirection}deg)`;
-
-                // Humidity
-                const humidity = data.data.current.weather.humidity || 'N/A'; // Ensure key names match API response
-                document.getElementById('humidity').innerText = `${humidity}%`;
-
-                // Hide error message if data is fetched successfully
-                document.getElementById('error').innerText = '';
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('aqi').innerText = '';
-                document.getElementById('wind').innerText = '';
-                document.getElementById('humidity').innerText = '';
-                document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
-            }
-        }
-
-        // Fetch data on page load
-        window.onload = getAirQuality;
-
-        // Refresh data every 10 minutes (600000 milliseconds)
-        setInterval(getAirQuality, 600000);
-    </script>
-</body>
-</html>
+            const url = `https://api.airvisual.com/v2/city?city=${city}&state=${state}&countr
