@@ -15,48 +15,34 @@
             background-color: #f0f0f0;
         }
         .widget {
-            background: white;
+            background: #f9f4e9;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 300px;
         }
-        .widget button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .widget button:hover {
-            background-color: #0056b3;
-        }
-        .widget .aqi {
-            margin-top: 20px;
-            font-size: 24px;
+        .aqi-number {
+            font-size: 48px;
             font-weight: bold;
+            margin: 20px 0;
         }
-        .widget .error {
-            margin-top: 20px;
+        .description {
+            font-size: 18px;
+            color: #000;
+        }
+        .error {
             font-size: 18px;
             color: red;
-        }
-        .widget .location {
-            font-size: 16px;
-            margin-top: 10px;
-            color: #555;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="widget">
-        <h2>AQI Widget</h2>
-        <button onclick="getAQI()">Get AQI for Salt Lake City, UT</button>
-        <div class="location">Salt Lake City, UT</div>
-        <div class="aqi" id="aqi">Click the button to get the current AQI.</div>
-        <div class="error" id="error"></div>
+        <div id="aqi" class="aqi-number">Loading...</div>
+        <div class="description">AQI in SLC</div>
+        <div id="error" class="error"></div>
     </div>
 
     <script>
@@ -76,7 +62,24 @@
                 }
 
                 const aqi = data.data.current.pollution.aqius;
-                document.getElementById('aqi').innerText = `AQI: ${aqi}`;
+                const aqiElement = document.getElementById('aqi');
+                aqiElement.innerText = aqi;
+
+                let color;
+                if (aqi <= 50) {
+                    color = 'green';
+                } else if (aqi <= 100) {
+                    color = 'yellow';
+                } else if (aqi <= 150) {
+                    color = 'orange';
+                } else if (aqi <= 200) {
+                    color = 'red';
+                } else if (aqi <= 300) {
+                    color = 'purple';
+                } else {
+                    color = 'maroon';
+                }
+                aqiElement.style.color = color;
                 document.getElementById('error').innerText = '';
             } catch (error) {
                 document.getElementById('aqi').innerText = '';
@@ -84,6 +87,9 @@
                 console.error('Error fetching AQI data:', error);
             }
         }
+
+        // Fetch AQI data on page load
+        window.onload = getAQI;
     </script>
 </body>
 </html>
