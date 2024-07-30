@@ -32,8 +32,8 @@
             height: 24px;
             margin-right: 10px;
         }
-        .aqi-number {
-            font-size: 48px;
+        .aqi-number, .wind-speed, .humidity {
+            font-size: 22px; /* Uniform font size for all text */
             font-weight: bold;
             margin: 0;
         }
@@ -56,12 +56,12 @@
         </div>
         <div>
             <img src="https://img.icons8.com/ios/50/000000/wind.png" alt="Wind Speed Icon">
-            <div id="wind-speed">Loading...</div>
+            <div id="wind-speed" class="wind-speed">Loading...</div>
             <img id="wind-direction" src="https://img.icons8.com/ios/50/000000/arrow.png" alt="Wind Direction Icon">
         </div>
         <div>
             <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity Icon">
-            <div id="humidity">Loading...</div>
+            <div id="humidity" class="humidity">Loading...</div>
         </div>
         <div id="error" class="error"></div>
     </div>
