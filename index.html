@@ -23,8 +23,8 @@
             width: 300px;
         }
         .icon {
-            width: 40px; /* Adjust as needed */
-            height: auto;
+            width: 30px;
+            height: 30px;
             vertical-align: middle;
         }
         .aqi-number {
@@ -41,32 +41,34 @@
             color: red;
             margin-top: 20px;
         }
-        .info {
-            font-size: 18px;
+        .stat {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            justify-content: center;
+            margin: 10px 0;
         }
-        .info img {
+        .stat img {
             margin-right: 10px;
+        }
+        .stat span {
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
     <div class="widget">
-        <div class="info">
-            <img src="https://img.icons8.com/ios/40/000000/air-quality.png" class="icon" id="aqi-icon" alt="AQI Icon">
-            <div id="aqi" class="aqi-number">Loading...</div>
+        <div class="stat">
+            <img src="https://img.icons8.com/ios/30/000000/air-quality.png" alt="AQI Icon" class="icon"/>
+            <span id="aqi">Loading...</span>
         </div>
-        <div id="main-pollutant" class="info">Loading...</div>
-        <div class="info">
-            <img src="https://img.icons8.com/ios/40/000000/wind.png" class="icon" alt="Wind Speed Icon">
-            <div id="wind-speed">Loading...</div>
-            <div id="wind-direction" style="display: inline-block; width: 20px; height: 20px; border: 2px solid #000; border-radius: 50%; transform: rotate(0deg);"></div>
+        <div class="stat">
+            <img src="https://img.icons8.com/ios/30/000000/wind.png" alt="Wind Speed Icon" class="icon"/>
+            <span id="wind-speed">Loading...</span>
+            <span id="wind-dir" style="display: inline-block; width: 20px; height: 20px; background: url('https://img.icons8.com/ios/20/000000/arrow-up.png') no-repeat center center; background-size: contain;"></span>
         </div>
-        <div class="info">
-            <img src="https://img.icons8.com/ios/40/000000/humidity.png" class="icon" alt="Humidity Icon">
-            <div id="humidity">Loading...</div>
+        <div class="stat">
+            <img src="https://img.icons8.com/ios/30/000000/humidity.png" alt="Humidity Icon" class="icon"/>
+            <span id="humidity">Loading...</span>
         </div>
         <div id="error" class="error"></div>
     </div>
@@ -77,4 +79,71 @@
             const city = 'Salt Lake City';
             const state = 'Utah';
             const country = 'USA';
-            const url = `https://api.airvisual.com/v2/city?city=${city}&state=${state}&countr
+            const url = `https://api.airvisual.com/v2/city?city=${city}&state=${state}&country=${country}&key=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.status !== 'success') {
+                    throw new Error(data.data.message);
+                }
+
+                // AQI
+                const aqi = data.data.current.pollution.aqius;
+                const aqiElement = document.getElementById('aqi');
+                aqiElement.innerText = aqi;
+
+                let aqiColor;
+                if (aqi <= 50) {
+                    aqiColor = '#00e400'; // green
+                } else if (aqi <= 100) {
+                    aqiColor = '#ffff00'; // slightly darker yellow
+                } else if (aqi <= 150) {
+                    aqiColor = '#ff7e00'; // orange
+                } else if (aqi <= 200) {
+                    aqiColor = '#ff0000'; // red
+                } else if (aqi <= 300) {
+                    aqiColor = '#aa00ff'; // purple
+                } else {
+                    aqiColor = '#e50000'; // maroon
+                }
+                aqiElement.style.color = aqiColor;
+
+                // Main pollutant
+                const mainPollutant = data.data.current.pollution.mainus;
+                const mainPollutantElement = document.getElementById('main-pollutant');
+                mainPollutantElement.innerText = mainPollutant;
+
+                // Wind speed and direction
+                const windSpeed = data.data.current.weather.ws;
+                const windDirection = data.data.current.weather.wd;
+                const windSpeedElement = document.getElementById('wind-speed');
+                windSpeedElement.innerText = windSpeed + ' MPH';
+
+                const windDirElement = document.getElementById('wind-dir');
+                windDirElement.style.transform = `rotate(${windDirection}deg)`;
+
+                // Humidity
+                const humidity = data.data.current.weather.hu;
+                const humidityElement = document.getElementById('humidity');
+                humidityElement.innerText = humidity + ' %';
+
+                document.getElementById('error').innerText = '';
+            } catch (error) {
+                document.getElementById('aqi').innerText = '';
+                document.getElementById('wind-speed').innerText = '';
+                document.getElementById('humidity').innerText = '';
+                document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
+                console.error('Error fetching AQI data:', error);
+            }
+        }
+
+        // Fetch AQI data on page load
+        window.onload = getAQI;
+
+        // Refresh AQI data every 10 minutes (600000 milliseconds)
+        setInterval(getAQI, 600000);
+    </script>
+</body>
+</html>
