@@ -85,6 +85,9 @@
                 const response = await fetch(url);
                 const data = await response.json();
 
+                // Log the response to inspect its structure
+                console.log(data);
+
                 if (data.status !== 'success') {
                     throw new Error(data.data.message);
                 }
@@ -92,7 +95,9 @@
                 // AQI
                 const aqi = data.data.current.pollution.aqius;
                 const aqiElement = document.getElementById('aqi');
-                aqiElement.innerText = aqi;
+                if (aqiElement) {
+                    aqiElement.innerText = aqi;
+                }
 
                 let aqiColor;
                 if (aqi <= 50) {
@@ -108,34 +113,44 @@
                 } else {
                     aqiColor = '#e50000'; // maroon
                 }
-                aqiElement.style.color = aqiColor;
+                if (aqiElement) {
+                    aqiElement.style.color = aqiColor;
+                }
 
                 // Main pollutant
                 const mainPollutant = data.data.current.pollution.mainus;
                 const mainPollutantElement = document.getElementById('main-pollutant');
-                mainPollutantElement.innerText = mainPollutant;
+                if (mainPollutantElement) {
+                    mainPollutantElement.innerText = mainPollutant;
+                }
 
                 // Wind speed and direction
                 const windSpeed = data.data.current.weather.ws;
                 const windDirection = data.data.current.weather.wd;
                 const windSpeedElement = document.getElementById('wind-speed');
-                windSpeedElement.innerText = windSpeed + ' MPH';
+                if (windSpeedElement) {
+                    windSpeedElement.innerText = windSpeed + ' MPH';
+                }
 
                 const windDirElement = document.getElementById('wind-dir');
-                windDirElement.style.transform = `rotate(${windDirection}deg)`;
+                if (windDirElement) {
+                    windDirElement.style.transform = `rotate(${windDirection}deg)`;
+                }
 
                 // Humidity
                 const humidity = data.data.current.weather.hu;
                 const humidityElement = document.getElementById('humidity');
-                humidityElement.innerText = humidity + ' %';
+                if (humidityElement) {
+                    humidityElement.innerText = humidity + ' %';
+                }
 
                 document.getElementById('error').innerText = '';
             } catch (error) {
+                console.error('Error fetching AQI data:', error);
                 document.getElementById('aqi').innerText = '';
                 document.getElementById('wind-speed').innerText = '';
                 document.getElementById('humidity').innerText = '';
                 document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
-                console.error('Error fetching AQI data:', error);
             }
         }
 
