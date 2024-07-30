@@ -17,76 +17,44 @@
         .widget {
             background: #F8F4F4;
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 0; /* Un-round the borders */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 300px;
         }
-        .section {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .section img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-        .section .data {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .data .value {
-            font-size: 20px;
+        .aqi-number {
+            font-size: 48px;
             font-weight: bold;
+            margin: 20px 0;
         }
-        .data .label {
-            font-size: 16px;
-        }
-        .arrow {
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 20px solid black;
-        }
-        .wind-arrow {
-            transform: rotate(45deg); /* Adjust based on wind direction */
+        .description {
+            font-size: 22px; /* Slightly larger text */
+            color: #000;
         }
         .error {
             font-size: 18px;
             color: red;
             margin-top: 20px;
         }
+        .wind-arrow {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: url('https://img.icons8.com/ios-filled/50/000000/wind.png') no-repeat center;
+            background-size: contain;
+            transform: rotate(0deg);
+            transition: transform 0.5s;
+        }
     </style>
 </head>
 <body>
     <div class="widget">
-        <!-- AQI Section -->
-        <div class="section">
-            <img src="https://img.icons8.com/material-outlined/24/000000/air-quality.png" alt="AQI Icon">
-            <div class="data">
-                <div id="aqi-number" class="value">Loading...</div>
-                <div id="main-pollutant" class="label"></div>
-            </div>
-        </div>
-        <!-- Wind Speed Section -->
-        <div class="section">
-            <img src="https://img.icons8.com/material-outlined/24/000000/wind.png" alt="Wind Speed Icon">
-            <div class="data">
-                <div id="wind-speed" class="value">Loading... MPH</div>
-                <div class="arrow wind-arrow" id="wind-arrow"></div>
-            </div>
-        </div>
-        <!-- Humidity Section -->
-        <div class="section">
-            <img src="https://img.icons8.com/material-outlined/24/000000/humidity.png" alt="Humidity Icon">
-            <div class="data">
-                <div id="humidity" class="value">Loading... %</div>
-            </div>
-        </div>
+        <div id="aqi" class="aqi-number">Loading...</div>
+        <div class="description">AQI in SLC</div>
+        <div id="main-pollutant"></div>
+        <div id="wind-speed"></div>
+        <div class="wind-arrow" id="wind-arrow"></div>
+        <div id="humidity"></div>
         <div id="error" class="error"></div>
     </div>
 
@@ -96,11 +64,16 @@
             const city = 'Salt Lake City';
             const state = 'Utah';
             const country = 'USA';
-            const url = `https://api.airvisual.com/v2/city?city=${city}&state=${state}&country=${country}&key=${apiKey}`;
+            const url = `https://api.airvisual.com/v2/city?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=${encodeURIComponent(country)}&key=${apiKey}`;
 
             try {
                 const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log(data); // Log the response data to verify structure
 
                 if (data.status !== 'success') {
                     throw new Error(data.data.message);
@@ -113,7 +86,7 @@
                 const humidity = data.data.current.weather.hu;
 
                 // Set AQI data
-                const aqiElement = document.getElementById('aqi-number');
+                const aqiElement = document.getElementById('aqi');
                 aqiElement.innerText = `${aqi}`;
                 let color;
                 if (aqi <= 50) color = 'green';
@@ -135,19 +108,16 @@
 
                 document.getElementById('error').innerText = '';
             } catch (error) {
-                document.getElementById('aqi-number').innerText = '';
+                document.getElementById('aqi').innerText = '';
                 document.getElementById('main-pollutant').innerText = '';
                 document.getElementById('wind-speed').innerText = '';
                 document.getElementById('humidity').innerText = '';
-                document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
+                document.getElementById('error').innerText = `Error fetching data: ${error.message}`;
                 console.error('Error fetching AQI data:', error);
             }
         }
 
-        // Fetch AQI data on page load
         window.onload = getAQI;
-
-        // Refresh AQI data every 10 minutes (600000 milliseconds)
         setInterval(getAQI, 600000);
     </script>
 </body>
