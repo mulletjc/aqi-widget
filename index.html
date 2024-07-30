@@ -90,6 +90,9 @@
 
         // Fetch AQI data on page load
         window.onload = getAQI;
+
+        // Refresh AQI data every 10 minutes (600000 milliseconds)
+        setInterval(getAQI, 600000);
     </script>
 </body>
 </html>
