@@ -12,52 +12,42 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #ffffff; /* Total background color */
+            background-color: #f0f0f0;
         }
         .widget {
-            background: #F8F4F4; /* Widget background color */
-            padding: 5px;
+            background: #F8F4F4;
+            padding: 5px; /* Tighten padding */
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: left; /* Align text to the left */
-            width: 80px; /* Widget width */
-            height: 80px; /* Widget height */
-            overflow: hidden;
+            text-align: left; /* Left align text */
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .icon {
-            width: 16px; /* Adjusted icon size */
-            height: 16px;
-            vertical-align: middle;
-            margin-right: 4px; /* Reduced margin */
-            opacity: 0.8; /* Slightly transparent icons */
+        .widget div {
+            margin: 2px 0; /* Tighten spacing */
+            display: flex;
+            align-items: center;
         }
-        .value {
-            font-size: 12px; /* Adjusted font size */
-            line-height: 16px;
-            display: inline-block;
+        .widget img {
+            height: 20px;
+            width: 20px;
+            margin-right: 5px;
+            filter: brightness(0) invert(1); /* White icon */
         }
         .aqi-number {
-            font-size: 12px; /* Adjusted font size */
+            font-size: 14px; /* Adjusted font size */
             font-weight: bold;
-            display: inline-block;
+            color: #000;
         }
         .description {
-            font-size: 10px; /* Smaller font size for descriptions */
+            font-size: 12px; /* Slightly larger text */
             color: #000;
-            margin: 0; /* Removed extra margin */
-        }
-        .arrow {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            margin-left: 4px; /* Reduced margin */
-            background-image: url('arrow-icon.png'); /* Use your arrow icon URL */
-            background-size: contain;
-            background-repeat: no-repeat;
-            transform: rotate(0deg);
         }
         .error {
-            font-size: 10px; /* Smaller font size for error messages */
+            font-size: 12px;
             color: red;
             margin-top: 5px;
         }
@@ -65,55 +55,51 @@
 </head>
 <body>
     <div class="widget">
-        <div id="aqi" class="value aqi-number">Loading...</div>
-        <div id="pollutant" class="description"></div>
-        <div id="wind" class="value"></div>
-        <div id="humidity" class="value"></div>
+        <div id="aqi">
+            <img src="https://icons8.com/icons/set/air-quality" alt="AQI Icon"> <!-- Adjusted to white icon -->
+            <span id="aqi-value">Loading...</span>
+            <span id="main-pollutant">Loading...</span>
+        </div>
+        <div id="wind">
+            <img src="https://icons8.com/icons/set/wind" alt="Wind Speed Icon"> <!-- Adjusted to white icon -->
+            <span id="wind-speed">Loading...</span>
+            <img id="wind-arrow" src="https://icons8.com/icons/set/arrow" alt="Wind Arrow"> <!-- Arrow icon URL to be replaced -->
+        </div>
+        <div id="humidity">
+            <img src="https://icons8.com/icons/set/humidity" alt="Humidity Icon"> <!-- Adjusted to white icon -->
+            <span id="humidity-value">Loading...</span>
+        </div>
         <div id="error" class="error"></div>
     </div>
 
     <script>
         async function getAQI() {
             const apiKey = '9dec4739-c9e3-44ed-ab3a-e7b56e02bb0e';
-            const url = `https://api.airvisual.com/v2/city?city=Salt%20Lake%20City&state=Utah&country=USA&key=${apiKey}`;
+            const city = 'Salt Lake City';
+            const state = 'Utah';
+            const country = 'USA';
+            const url = `https://api.airvisual.com/v2/city?city=${city}&state=${state}&country=${country}&key=${apiKey}`;
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                
-                // Debugging: Log the received data
-                console.log('AQI Data:', data);
 
                 if (data.status !== 'success') {
                     throw new Error(data.data.message);
                 }
 
                 const aqi = data.data.current.pollution.aqius;
+                const aqiElement = document.getElementById('aqi-value');
                 const mainPollutant = data.data.current.pollution.mainus;
-                const windSpeed = Math.round(data.data.current.weather.ws);
+                const windSpeed = Math.round(data.data.current.weather.ws * 2.23694); // Convert from m/s to mph
                 const windDirection = data.data.current.weather.wd;
                 const humidity = data.data.current.weather.hu;
 
-                // Debugging: Log element selections
-                console.log('AQI Element:', document.getElementById('aqi'));
-                console.log('Pollutant Element:', document.getElementById('pollutant'));
-                console.log('Wind Element:', document.getElementById('wind'));
-                console.log('Humidity Element:', document.getElementById('humidity'));
+                aqiElement.innerText = aqi;
+                document.getElementById('main-pollutant').innerText = mainPollutant;
+                document.getElementById('wind-speed').innerText = windSpeed + ' MPH';
+                document.getElementById('humidity-value').innerText = humidity + '%';
 
-                const aqiElement = document.getElementById('aqi');
-                const pollutantElement = document.getElementById('pollutant');
-                const windElement = document.getElementById('wind');
-                const humidityElement = document.getElementById('humidity');
-
-                if (!aqiElement || !pollutantElement || !windElement || !humidityElement) {
-                    throw new Error('One or more elements are missing.');
-                }
-
-                aqiElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/16/000000/air-quality.png" class="icon"/> ${aqi} <span class="description">${mainPollutant}</span>`;
-                windElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/16/000000/wind.png" class="icon"/> ${windSpeed} MPH <span class="arrow" style="transform: rotate(${windDirection - 90}deg);"></span>`;
-                humidityElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/16/000000/humidity.png" class="icon"/> ${humidity}%`;
-
-                // Color coding
                 let color;
                 if (aqi <= 50) {
                     color = 'green';
@@ -129,18 +115,26 @@
                     color = 'maroon';
                 }
                 aqiElement.style.color = color;
+
+                // Set wind arrow direction
+                const arrow = document.getElementById('wind-arrow');
+                arrow.style.transform = `rotate(${windDirection}deg)`;
+
                 document.getElementById('error').innerText = '';
             } catch (error) {
-                document.getElementById('aqi').innerText = '';
-                document.getElementById('pollutant').innerText = '';
-                document.getElementById('wind').innerText = '';
-                document.getElementById('humidity').innerText = '';
+                document.getElementById('aqi-value').innerText = '';
+                document.getElementById('main-pollutant').innerText = '';
+                document.getElementById('wind-speed').innerText = '';
+                document.getElementById('humidity-value').innerText = '';
                 document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
                 console.error('Error fetching AQI data:', error);
             }
         }
 
+        // Fetch AQI data on page load
         window.onload = getAQI;
+
+        // Refresh AQI data every 10 minutes (600000 milliseconds)
         setInterval(getAQI, 600000);
     </script>
 </body>
