@@ -51,18 +51,18 @@
     <div class="widget">
         <!-- AQI Section -->
         <div class="info">
-            <img src="https://img.icons8.com/ios/50/000000/gauge.png" alt="AQI Icon">
+            <img src="https://img.icons8.com/ios/50/000000/gauge.png" alt="AQI Icon" id="aqi-icon">
             <div class="text" id="aqi">Loading...</div>
         </div>
         <!-- Wind Speed Section -->
         <div class="info">
-            <img src="https://img.icons8.com/ios/50/000000/wind.png" alt="Wind Speed Icon">
+            <img src="https://img.icons8.com/ios/50/000000/wind.png" alt="Wind Speed Icon" id="wind-icon">
             <div class="text" id="wind">Loading...</div>
             <img src="https://img.icons8.com/ios/50/000000/long-arrow-up.png" id="wind-dir" alt="Wind Direction Icon">
         </div>
         <!-- Humidity Section -->
         <div class="info">
-            <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity Icon">
+            <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity Icon" id="humidity-icon">
             <div class="text" id="humidity">Loading...</div>
         </div>
         <div id="error" class="error"></div>
@@ -123,6 +123,7 @@
                 const humidity = data.data.current.weather.humidity || 'N/A'; // Ensure key names match API response
                 document.getElementById('humidity').innerText = `${humidity}%`;
 
+                // Hide error message if data is fetched successfully
                 document.getElementById('error').innerText = '';
             } catch (error) {
                 console.error('Error fetching data:', error);
