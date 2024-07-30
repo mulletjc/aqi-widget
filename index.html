@@ -78,10 +78,14 @@
                 const response = await fetch(url);
                 const data = await response.json();
 
+                // Debugging: Log the entire data object to check its structure
+                console.log('AQI Data:', data);
+
                 if (data.status !== 'success') {
                     throw new Error(data.data.message);
                 }
 
+                // Update AQI
                 const aqi = data.data.current.pollution.aqius;
                 const mainPollutant = data.data.current.pollution.mainus;
                 const windSpeed = Math.round(data.data.current.wind.ws); // Round MPH
@@ -107,7 +111,7 @@
                 }
                 aqiElement.style.color = aqiColor;
 
-                // Update Wind Speed
+                // Update Wind Speed and Direction
                 document.getElementById('wind-speed').innerText = `${windSpeed} MPH`;
                 const windDirectionIcon = document.getElementById('wind-direction');
                 windDirectionIcon.style.transform = `rotate(${windDirection}deg)`;
