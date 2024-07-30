@@ -88,9 +88,14 @@
                 // Update AQI
                 const aqi = data.data.current.pollution.aqius;
                 const mainPollutant = data.data.current.pollution.mainus;
-                const windSpeed = Math.round(data.data.current.wind.ws); // Round MPH
-                const windDirection = data.data.current.wind.wd;
-                const humidity = data.data.current.weather.hu;
+
+                // Check the exact structure for wind and humidity
+                console.log('Wind Data:', data.data.current.wind);
+                console.log('Weather Data:', data.data.current.weather);
+
+                const windSpeed = data.data.current.wind?.ws ? Math.round(data.data.current.wind.ws) : 'N/A'; // Round MPH
+                const windDirection = data.data.current.wind?.wd || 'N/A';
+                const humidity = data.data.current.weather?.hu || 'N/A';
 
                 // Update AQI
                 const aqiElement = document.getElementById('aqi');
@@ -114,7 +119,11 @@
                 // Update Wind Speed and Direction
                 document.getElementById('wind-speed').innerText = `${windSpeed} MPH`;
                 const windDirectionIcon = document.getElementById('wind-direction');
-                windDirectionIcon.style.transform = `rotate(${windDirection}deg)`;
+                if (windDirection !== 'N/A') {
+                    windDirectionIcon.style.transform = `rotate(${windDirection}deg)`;
+                } else {
+                    windDirectionIcon.style.display = 'none'; // Hide if wind direction is not available
+                }
 
                 // Update Humidity
                 document.getElementById('humidity').innerText = `${humidity}%`;
