@@ -12,82 +12,61 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #F8F4F4; /* Updated background color */
+            background-color: #f0f0f0;
         }
         .widget {
-            background: #FFFFFF; /* White background for the widget */
-            padding: 20px;
-            border-radius: 8px; /* Slightly rounded corners */
+            background: #F8F4F4;
+            padding: 10px;
+            border-radius: 0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: left;
-            width: 150px;
+            width: 80px;
+            height: 80px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .widget div {
-            margin-bottom: 15px;
+        .widget-item {
             display: flex;
             align-items: center;
+            font-size: 10px;
         }
-        .widget img {
-            width: 24px; /* Adjust icon size if needed */
-            height: auto;
-            margin-right: 10px;
+        .widget-item img {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
         }
-        .value {
-            font-size: 22px;
+        .aqi-number {
+            font-size: 14px;
             font-weight: bold;
         }
         .description {
-            font-size: 16px; /* Consistent font size */
             color: #000;
-        }
-        .arrow {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            margin-left: 10px;
-            background-image: url('https://img.icons8.com/ios/50/000000/long-arrow.png');
-            background-size: cover;
-            transform: rotate(0deg); /* Rotate based on wind direction */
+            font-size: 10px;
         }
         .error {
-            font-size: 16px;
+            font-size: 10px;
             color: red;
-            margin-top: 20px;
-        }
-        .main-pollutant {
-            font-size: 22px; /* Match AQI font size */
-            color: #000;
-            margin-left: 10px; /* Space between AQI and main pollutant */
-        }
-        .aqi-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .aqi-value {
-            flex: 1;
-            display: flex;
-            align-items: center;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="widget">
-        <div class="aqi-container">
-            <img src="https://img.icons8.com/ios/50/000000/air-quality.png" alt="AQI Icon">
-            <div class="aqi-value">
-                <div id="aqi" class="value">Loading...</div>
-                <div id="main-pollutant" class="main-pollutant">Loading...</div>
-            </div>
+        <div class="widget-item">
+            <img id="aqi-icon" src="https://img.icons8.com/material-outlined/24/000000/air-quality.png" alt="AQI Icon"/>
+            <div id="aqi" class="aqi-number">Loading...</div>
+            <div id="main-pollutant"></div>
         </div>
-        <div>
-            <img src="https://img.icons8.com/ios/50/000000/wind.png" alt="Wind Speed Icon">
-            <div id="wind-speed" class="value">Loading...</div>
-            <div id="wind-direction" class="arrow"></div>
+        <div class="widget-item">
+            <img id="wind-icon" src="https://img.icons8.com/material-outlined/24/000000/wind.png" alt="Wind Icon"/>
+            <div id="wind-speed">Loading...</div>
+            <div id="wind-dir"></div>
         </div>
-        <div>
-            <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity Icon">
-            <div id="humidity" class="value">Loading...</div>
+        <div class="widget-item">
+            <img id="humidity-icon" src="https://img.icons8.com/material-outlined/24/000000/humidity.png" alt="Humidity Icon"/>
+            <div id="humidity">Loading...</div>
         </div>
         <div id="error" class="error"></div>
     </div>
@@ -114,45 +93,59 @@
                 const windDirection = data.data.current.weather.wd;
                 const humidity = data.data.current.weather.hu;
 
-                // Update AQI
+                // AQI
                 const aqiElement = document.getElementById('aqi');
-                if (aqiElement) aqiElement.innerText = aqi;
-                if (aqiElement) aqiElement.style.color = getAQIColor(aqi);
+                aqiElement.innerText = aqi;
 
-                // Update Main Pollutant
+                let aqiColor;
+                if (aqi <= 50) {
+                    aqiColor = '#00E400'; // Green
+                } else if (aqi <= 100) {
+                    aqiColor = '#FFFF00'; // Darker Yellow
+                } else if (aqi <= 150) {
+                    aqiColor = '#FF7E00'; // Orange
+                } else if (aqi <= 200) {
+                    aqiColor = '#FF0000'; // Red
+                } else if (aqi <= 300) {
+                    aqiColor = '#7E0023'; // Purple
+                } else {
+                    aqiColor = '#6C0F3D'; // Maroon
+                }
+                aqiElement.style.color = aqiColor;
+
+                // Main Pollutant
                 const mainPollutantElement = document.getElementById('main-pollutant');
-                if (mainPollutantElement) mainPollutantElement.innerText = mainPollutant;
+                mainPollutantElement.innerText = mainPollutant;
 
-                // Update Wind Speed
+                // Wind Speed
                 const windSpeedElement = document.getElementById('wind-speed');
-                if (windSpeedElement) windSpeedElement.innerText = `${Math.round(windSpeed)} MPH`;
+                windSpeedElement.innerText = `${Math.round(windSpeed)} MPH`;
 
-                // Update Wind Direction Arrow
-                const windDirectionElement = document.getElementById('wind-direction');
-                if (windDirectionElement) windDirectionElement.style.transform = `rotate(${windDirection}deg)`;
+                // Wind Direction
+                const windDirElement = document.getElementById('wind-dir');
+                const windArrow = document.createElement('img');
+                windArrow.src = `https://img.icons8.com/material-outlined/16/000000/long-arrow-up.png`;
+                windArrow.style.transform = `rotate(${windDirection}deg)`;
+                windArrow.style.width = '16px';
+                windArrow.style.height = '16px';
+                windDirElement.appendChild(windArrow);
 
-                // Update Humidity
+                // Humidity
                 const humidityElement = document.getElementById('humidity');
-                if (humidityElement) humidityElement.innerText = `${humidity} %`;
+                humidityElement.innerText = `${humidity} %`;
 
+                // Clear error message
                 document.getElementById('error').innerText = '';
             } catch (error) {
+                // Clear data
                 document.getElementById('aqi').innerText = '';
-                document.getElementById('wind-speed').innerText = '';
-                document.getElementById('humidity').innerText = '';
                 document.getElementById('main-pollutant').innerText = '';
+                document.getElementById('wind-speed').innerText = '';
+                document.getElementById('wind-dir').innerHTML = '';
+                document.getElementById('humidity').innerText = '';
                 document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
                 console.error('Error fetching AQI data:', error);
             }
-        }
-
-        function getAQIColor(aqi) {
-            if (aqi <= 50) return 'green';
-            if (aqi <= 100) return '#f7e4a2'; // Darker yellow
-            if (aqi <= 150) return 'orange';
-            if (aqi <= 200) return 'red';
-            if (aqi <= 300) return 'purple';
-            return 'maroon';
         }
 
         // Fetch AQI data on page load
