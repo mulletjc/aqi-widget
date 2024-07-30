@@ -12,62 +12,69 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #ffffff;
         }
         .widget {
             background: #F8F4F4;
-            padding: 5px; /* Tighten padding */
+            padding: 10px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: left; /* Left align text */
-            width: 80px;
-            height: 80px;
+            text-align: left;
+            width: 100px;
+            height: 100px;
+            font-size: 12px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-        }
-        .widget div {
-            margin: 2px 0; /* Tighten spacing */
-            display: flex;
-            align-items: center;
+            justify-content: space-between;
         }
         .widget img {
             height: 20px;
-            width: 20px;
+            width: auto;
             margin-right: 5px;
-            filter: brightness(0) invert(1); /* White icon */
+            vertical-align: middle;
         }
-        .aqi-number {
-            font-size: 14px; /* Adjusted font size */
+        .widget .icon-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+        .widget .icon-container span {
+            font-size: 14px;
+            line-height: 1.2;
+        }
+        .widget .icon-container .icon {
+            height: 20px;
+        }
+        .widget .aqi-value {
+            font-size: 16px;
             font-weight: bold;
             color: #000;
         }
-        .description {
-            font-size: 12px; /* Slightly larger text */
-            color: #000;
+        .widget .description {
+            font-size: 14px;
         }
-        .error {
+        .widget .error {
             font-size: 12px;
             color: red;
-            margin-top: 5px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="widget">
-        <div id="aqi">
-            <img src="https://icons8.com/icons/set/air-quality" alt="AQI Icon"> <!-- Adjusted to white icon -->
-            <span id="aqi-value">Loading...</span>
-            <span id="main-pollutant">Loading...</span>
+        <div class="icon-container">
+            <img src="https://img.icons8.com/ios/50/000000/air-quality.png" alt="AQI Icon" class="icon">
+            <span id="aqi" class="aqi-value">Loading...</span> 
+            <span id="mainus"></span>
         </div>
-        <div id="wind">
-            <img src="https://icons8.com/icons/set/wind" alt="Wind Speed Icon"> <!-- Adjusted to white icon -->
-            <span id="wind-speed">Loading...</span>
-            <img id="wind-arrow" src="https://icons8.com/icons/set/arrow" alt="Wind Arrow"> <!-- Arrow icon URL to be replaced -->
+        <div class="icon-container">
+            <img src="https://img.icons8.com/ios/50/000000/wind.png" alt="Wind Speed Icon" class="icon">
+            <span id="wind-speed">Loading... MPH</span>
+            <img id="arrow" src="https://img.icons8.com/ios/50/000000/arrow.png" alt="Arrow Icon">
         </div>
-        <div id="humidity">
-            <img src="https://icons8.com/icons/set/humidity" alt="Humidity Icon"> <!-- Adjusted to white icon -->
-            <span id="humidity-value">Loading...</span>
+        <div class="icon-container">
+            <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity Icon" class="icon">
+            <span id="humidity">Loading...%</span>
         </div>
         <div id="error" class="error"></div>
     </div>
@@ -89,43 +96,54 @@
                 }
 
                 const aqi = data.data.current.pollution.aqius;
-                const aqiElement = document.getElementById('aqi-value');
                 const mainPollutant = data.data.current.pollution.mainus;
-                const windSpeed = Math.round(data.data.current.weather.ws * 2.23694); // Convert from m/s to mph
+                const windSpeed = data.data.current.weather.ws;
                 const windDirection = data.data.current.weather.wd;
                 const humidity = data.data.current.weather.hu;
 
+                // AQI
+                const aqiElement = document.getElementById('aqi');
                 aqiElement.innerText = aqi;
-                document.getElementById('main-pollutant').innerText = mainPollutant;
-                document.getElementById('wind-speed').innerText = windSpeed + ' MPH';
-                document.getElementById('humidity-value').innerText = humidity + '%';
 
-                let color;
+                // Main Pollutant
+                const mainPollutantElement = document.getElementById('mainus');
+                mainPollutantElement.innerText = mainPollutant;
+
+                let aqiColor;
                 if (aqi <= 50) {
-                    color = 'green';
+                    aqiColor = 'green';
                 } else if (aqi <= 100) {
-                    color = '#FFD700'; // Darker yellow
+                    aqiColor = '#F4A300'; // Darker yellow
                 } else if (aqi <= 150) {
-                    color = 'orange';
+                    aqiColor = 'orange';
                 } else if (aqi <= 200) {
-                    color = 'red';
+                    aqiColor = 'red';
                 } else if (aqi <= 300) {
-                    color = 'purple';
+                    aqiColor = 'purple';
                 } else {
-                    color = 'maroon';
+                    aqiColor = 'maroon';
                 }
-                aqiElement.style.color = color;
+                aqiElement.style.color = aqiColor;
 
-                // Set wind arrow direction
-                const arrow = document.getElementById('wind-arrow');
-                arrow.style.transform = `rotate(${windDirection}deg)`;
+                // Wind Speed
+                const windSpeedElement = document.getElementById('wind-speed');
+                windSpeedElement.innerText = `${Math.round(windSpeed)} MPH`;
 
+                // Wind Direction Arrow
+                const arrowElement = document.getElementById('arrow');
+                arrowElement.style.transform = `rotate(${windDirection}deg)`;
+
+                // Humidity
+                const humidityElement = document.getElementById('humidity');
+                humidityElement.innerText = `${humidity}%`;
+
+                // Clear Error
                 document.getElementById('error').innerText = '';
             } catch (error) {
-                document.getElementById('aqi-value').innerText = '';
-                document.getElementById('main-pollutant').innerText = '';
-                document.getElementById('wind-speed').innerText = '';
-                document.getElementById('humidity-value').innerText = '';
+                document.getElementById('aqi').innerText = '';
+                document.getElementById('mainus').innerText = '';
+                document.getElementById('wind-speed').innerText = 'Loading... MPH';
+                document.getElementById('humidity').innerText = 'Loading...%';
                 document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
                 console.error('Error fetching AQI data:', error);
             }
