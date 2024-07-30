@@ -3,96 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQI Widget</title>
+    <title>Weather Stats Widget</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
         .widget {
             background: #F8F4F4;
             padding: 20px;
-            border-radius: 0; /* Un-round the borders */
+            border-radius: 0; /* Un-rounded borders */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
             width: 300px;
         }
-        .aqi-number {
-            font-size: 48px;
-            font-weight: bold;
-            margin: 20px 0;
+        .stats-list {
+            list-style: none;
+            padding: 0;
         }
-        .description {
-            font-size: 22px; /* Slightly larger text */
-            color: #000;
+        .stats-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         }
-        .error {
+        .stats-list img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        .stats-list .value {
             font-size: 18px;
-            color: red;
-            margin-top: 20px;
+            margin-left: 5px;
+        }
+        .stats-list .label {
+            font-size: 14px;
+            color: #555;
         }
     </style>
 </head>
 <body>
     <div class="widget">
-        <div id="aqi" class="aqi-number">Loading...</div>
-        <div class="description">AQI in SLC</div>
-        <div id="error" class="error"></div>
+        <ul class="stats-list">
+            <li>
+                <img src="https://img.icons8.com/ios/50/000000/air-quality.png" alt="AQI icon">
+                <span class="label">AQI:</span>
+                <span id="aqi" class="value">Loading...</span>
+            </li>
+            <li>
+                <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity icon">
+                <span class="label">Humidity:</span>
+                <span id="humidity" class="value">Loading...</span>
+            </li>
+            <li>
+                <img src="https://img.icons8.com/ios/50/000000/sun-uv.png" alt="UV index icon">
+                <span class="label">UV Index:</span>
+                <span id="uvIndex" class="value">Loading...</span>
+            </li>
+        </ul>
     </div>
 
     <script>
-        async function getAQI() {
-            const apiKey = '9dec4739-c9e3-44ed-ab3a-e7b56e02bb0e';
-            const city = 'Salt Lake City';
-            const state = 'Utah';
-            const country = 'USA';
-            const url = `https://api.airvisual.com/v2/city?city=${city}&state=${state}&country=${country}&key=${apiKey}`;
+        async function getWeatherStats() {
+            const apiKey = '57421413fce82acda2679df4f136ec7a';
+            const lat = 40.7336;
+            const lon = -111.8552;
+
+            // Endpoints
+            const airPollutionUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
 
             try {
-                const response = await fetch(url);
-                const data = await response.json();
+                // Fetch air pollution data
+                const airResponse = await fetch(airPollutionUrl);
+                const airData = await airResponse.json();
+                
+                // Fetch weather data
+                const weatherResponse = await fetch(weatherUrl);
+                const weatherData = await weatherResponse.json();
 
-                if (data.status !== 'success') {
-                    throw new Error(data.data.message);
+                if (airData.cod !== 200 || weatherData.cod !== 200) {
+                    throw new Error('Error fetching data');
                 }
 
-                const aqi = data.data.current.pollution.aqius;
-                const aqiElement = document.getElementById('aqi');
-                aqiElement.innerText = aqi;
+                // Extract data
+                const aqi = airData.list[0].main.aqi;
+                const humidity = weatherData.main.humidity;
+                const uvIndex = weatherData.current.uvi; // Assuming UV index data is included in the current weather endpoint
 
-                let color;
-                if (aqi <= 50) {
-                    color = 'green';
-                } else if (aqi <= 100) {
-                    color = 'yellow';
-                } else if (aqi <= 150) {
-                    color = 'orange';
-                } else if (aqi <= 200) {
-                    color = 'red';
-                } else if (aqi <= 300) {
-                    color = 'purple';
-                } else {
-                    color = 'maroon';
-                }
-                aqiElement.style.color = color;
-                document.getElementById('error').innerText = '';
+                // Update DOM
+                document.getElementById('aqi').innerText = aqi;
+                document.getElementById('humidity').innerText = humidity + '%';
+                document.getElementById('uvIndex').innerText = uvIndex;
+
             } catch (error) {
-                document.getElementById('aqi').innerText = '';
-                document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
-                console.error('Error fetching AQI data:', error);
+                console.error('Error fetching data:', error);
+                document.getElementById('aqi').innerText = 'Error';
+                document.getElementById('humidity').innerText = 'Error';
+                document.getElementById('uvIndex').innerText = 'Error';
             }
         }
 
-        // Fetch AQI data on page load
-        window.onload = getAQI;
-
-        // Refresh AQI data every 10 minutes (600000 milliseconds)
-        setInterval(getAQI, 600000);
+        window.onload = getWeatherStats;
     </script>
 </body>
 </html>
