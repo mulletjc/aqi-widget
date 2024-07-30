@@ -11,6 +11,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
             background-color: #f0f0f0;
         }
         .widget {
@@ -19,14 +20,33 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            width: 300px;
         }
         .widget button {
             padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .widget button:hover {
+            background-color: #0056b3;
         }
         .widget .aqi {
             margin-top: 20px;
             font-size: 24px;
             font-weight: bold;
+        }
+        .widget .error {
+            margin-top: 20px;
+            font-size: 18px;
+            color: red;
+        }
+        .widget .location {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #555;
         }
     </style>
 </head>
@@ -34,7 +54,9 @@
     <div class="widget">
         <h2>AQI Widget</h2>
         <button onclick="getAQI()">Get AQI for Salt Lake City, UT</button>
-        <div class="aqi" id="aqi"></div>
+        <div class="location">Salt Lake City, UT</div>
+        <div class="aqi" id="aqi">Click the button to get the current AQI.</div>
+        <div class="error" id="error"></div>
     </div>
 
     <script>
@@ -48,10 +70,17 @@
             try {
                 const response = await fetch(url);
                 const data = await response.json();
+
+                if (data.status !== 'success') {
+                    throw new Error(data.data.message);
+                }
+
                 const aqi = data.data.current.pollution.aqius;
                 document.getElementById('aqi').innerText = `AQI: ${aqi}`;
+                document.getElementById('error').innerText = '';
             } catch (error) {
-                document.getElementById('aqi').innerText = 'Error fetching data';
+                document.getElementById('aqi').innerText = '';
+                document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
                 console.error('Error fetching AQI data:', error);
             }
         }
