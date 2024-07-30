@@ -62,8 +62,8 @@
 </head>
 <body>
     <div class="widget">
-        <div id="aqi" class="value aqi-number">Loading...</span>
-        <span id="pollutant" class="description"></span>
+        <div id="aqi" class="value aqi-number">Loading...</div>
+        <div id="pollutant" class="description"></div>
         <div id="wind" class="value"></div>
         <div id="humidity" class="value"></div>
         <div id="error" class="error"></div>
@@ -73,9 +73,14 @@
         async function getAQI() {
             const apiKey = '9dec4739-c9e3-44ed-ab3a-e7b56e02bb0e';
             const url = `https://api.airvisual.com/v2/city?city=Salt%20Lake%20City&state=Utah&country=USA&key=${apiKey}`;
+
             try {
                 const response = await fetch(url);
                 const data = await response.json();
+                
+                // Debugging: Log the received data
+                console.log('AQI Data:', data);
+
                 if (data.status !== 'success') {
                     throw new Error(data.data.message);
                 }
@@ -86,10 +91,20 @@
                 const windDirection = data.data.current.weather.wd;
                 const humidity = data.data.current.weather.hu;
 
+                // Debugging: Log element selections
+                console.log('AQI Element:', document.getElementById('aqi'));
+                console.log('Pollutant Element:', document.getElementById('pollutant'));
+                console.log('Wind Element:', document.getElementById('wind'));
+                console.log('Humidity Element:', document.getElementById('humidity'));
+
                 const aqiElement = document.getElementById('aqi');
                 const pollutantElement = document.getElementById('pollutant');
                 const windElement = document.getElementById('wind');
                 const humidityElement = document.getElementById('humidity');
+
+                if (!aqiElement || !pollutantElement || !windElement || !humidityElement) {
+                    throw new Error('One or more elements are missing.');
+                }
 
                 aqiElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/20/000000/air-quality.png" class="icon"/> ${aqi}`;
                 pollutantElement.innerText = ` ${mainPollutant}`;
