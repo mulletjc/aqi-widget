@@ -54,13 +54,31 @@
             color: red;
             margin-top: 20px;
         }
+        .main-pollutant {
+            font-size: 22px; /* Match AQI font size */
+            color: #000;
+            margin-left: 10px; /* Space between AQI and main pollutant */
+        }
+        .aqi-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .aqi-value {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
     <div class="widget">
-        <div>
+        <div class="aqi-container">
             <img src="https://img.icons8.com/ios/50/000000/air-quality.png" alt="AQI Icon">
-            <div id="aqi" class="value">Loading...</div>
+            <div class="aqi-value">
+                <div id="aqi" class="value">Loading...</div>
+                <div id="main-pollutant" class="main-pollutant">Loading...</div>
+            </div>
         </div>
         <div>
             <img src="https://img.icons8.com/ios/50/000000/wind.png" alt="Wind Speed Icon">
@@ -70,10 +88,6 @@
         <div>
             <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity Icon">
             <div id="humidity" class="value">Loading...</div>
-        </div>
-        <div>
-            <img src="https://img.icons8.com/ios/50/000000/air-pollution.png" alt="Main Pollutant Icon">
-            <div id="main-pollutant" class="value">Loading...</div>
         </div>
         <div id="error" class="error"></div>
     </div>
