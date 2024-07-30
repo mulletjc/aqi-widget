@@ -71,29 +71,29 @@
                 // Fetch air pollution data
                 const airResponse = await fetch(airPollutionUrl);
                 if (!airResponse.ok) {
-                    throw new Error('Air pollution data not found');
+                    throw new Error('Error fetching air pollution data');
                 }
                 const airData = await airResponse.json();
-
+                
                 // Fetch weather data
                 const weatherResponse = await fetch(weatherUrl);
                 if (!weatherResponse.ok) {
-                    throw new Error('Weather data not found');
+                    throw new Error('Error fetching weather data');
                 }
                 const weatherData = await weatherResponse.json();
 
                 // Extract data
                 const aqi = airData.list[0].main.aqi;
                 const humidity = weatherData.main.humidity;
-                const uvIndex = weatherData.current.uvi; // Update based on available data
+                const uvIndex = weatherData.current.uvi; // Check if `uvi` exists in the weatherData
 
                 // Update DOM
                 document.getElementById('aqi').innerText = aqi;
                 document.getElementById('humidity').innerText = humidity + '%';
-                document.getElementById('uvIndex').innerText = uvIndex || 'N/A'; // Handle missing UV index data
+                document.getElementById('uvIndex').innerText = uvIndex || 'N/A'; // Handle missing UV index
 
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error:', error);
                 document.getElementById('aqi').innerText = 'Error';
                 document.getElementById('humidity').innerText = 'Error';
                 document.getElementById('uvIndex').innerText = 'Error';
