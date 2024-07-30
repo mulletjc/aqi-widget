@@ -25,36 +25,39 @@
             overflow: hidden;
         }
         .icon {
-            width: 20px;
-            height: 20px;
+            width: 16px; /* Adjusted icon size */
+            height: 16px;
             vertical-align: middle;
-            margin-right: 5px;
+            margin-right: 4px; /* Reduced margin */
+            opacity: 0.8; /* Slightly transparent icons */
         }
         .value {
-            font-size: 14px; /* Slightly increased font size */
-            line-height: 20px;
+            font-size: 12px; /* Adjusted font size */
+            line-height: 16px;
             display: inline-block;
         }
         .aqi-number {
-            font-size: 14px; /* Adjusted font size */
+            font-size: 12px; /* Adjusted font size */
             font-weight: bold;
+            display: inline-block;
         }
         .description {
-            font-size: 12px;
+            font-size: 10px; /* Smaller font size for descriptions */
             color: #000;
+            margin: 0; /* Removed extra margin */
         }
         .arrow {
             display: inline-block;
             width: 10px;
             height: 10px;
-            margin-left: 5px;
+            margin-left: 4px; /* Reduced margin */
             background-image: url('arrow-icon.png'); /* Use your arrow icon URL */
             background-size: contain;
             background-repeat: no-repeat;
             transform: rotate(0deg);
         }
         .error {
-            font-size: 12px;
+            font-size: 10px; /* Smaller font size for error messages */
             color: red;
             margin-top: 5px;
         }
@@ -106,10 +109,9 @@
                     throw new Error('One or more elements are missing.');
                 }
 
-                aqiElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/20/000000/air-quality.png" class="icon"/> ${aqi}`;
-                pollutantElement.innerText = ` ${mainPollutant}`;
-                windElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/20/000000/wind.png" class="icon"/> ${windSpeed} MPH <span class="arrow" style="transform: rotate(${windDirection - 90}deg);"></span>`;
-                humidityElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/20/000000/humidity.png" class="icon"/> ${humidity}%`;
+                aqiElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/16/000000/air-quality.png" class="icon"/> ${aqi} <span class="description">${mainPollutant}</span>`;
+                windElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/16/000000/wind.png" class="icon"/> ${windSpeed} MPH <span class="arrow" style="transform: rotate(${windDirection - 90}deg);"></span>`;
+                humidityElement.innerHTML = `<img src="https://img.icons8.com/ios-filled/16/000000/humidity.png" class="icon"/> ${humidity}%`;
 
                 // Color coding
                 let color;
