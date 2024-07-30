@@ -49,9 +49,11 @@
             font-size: 16px;
             font-weight: bold;
             color: #000;
+            margin-right: 5px;
         }
         .widget .description {
-            font-size: 14px;
+            font-size: 12px;
+            margin-right: 5px;
         }
         .widget .error {
             font-size: 12px;
@@ -59,6 +61,9 @@
             margin-top: 5px;
         }
         .widget .arrow {
+            height: 20px;
+            width: 20px;
+            vertical-align: middle;
             margin-left: 5px;
         }
     </style>
@@ -67,8 +72,8 @@
     <div class="widget">
         <div class="icon-container">
             <img src="https://img.icons8.com/ios/50/000000/air-quality.png" alt="AQI Icon" class="icon">
-            <span id="aqi" class="aqi-value">Loading...</span> 
-            <span id="mainus"></span>
+            <span id="aqi" class="aqi-value">Loading...</span>
+            <span id="mainus" class="description">Loading...</span>
         </div>
         <div class="icon-container">
             <img src="https://img.icons8.com/ios/50/000000/wind.png" alt="Wind Speed Icon" class="icon">
@@ -77,7 +82,7 @@
         </div>
         <div class="icon-container">
             <img src="https://img.icons8.com/ios/50/000000/humidity.png" alt="Humidity Icon" class="icon">
-            <span id="humidity">Loading...%</span>
+            <span id="humidity">Loading... %</span>
         </div>
         <div id="error" class="error"></div>
     </div>
@@ -99,7 +104,7 @@
                 }
 
                 const aqi = data.data.current.pollution.aqius;
-                const mainPollutant = data.data.current.pollution.mainus;
+                const mainPollutant = getMainPollutant(data.data.current.pollution.mainus);
                 const windSpeed = data.data.current.weather.ws;
                 const windDirection = data.data.current.weather.wd;
                 const humidity = data.data.current.weather.hu;
@@ -138,7 +143,7 @@
 
                 // Humidity
                 const humidityElement = document.getElementById('humidity');
-                humidityElement.innerText = `${humidity}%`;
+                humidityElement.innerText = `${humidity} %`;
 
                 // Clear Error
                 document.getElementById('error').innerText = '';
@@ -146,9 +151,28 @@
                 document.getElementById('aqi').innerText = '';
                 document.getElementById('mainus').innerText = '';
                 document.getElementById('wind-speed').innerText = 'Loading... MPH';
-                document.getElementById('humidity').innerText = 'Loading...%';
+                document.getElementById('humidity').innerText = 'Loading... %';
                 document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
                 console.error('Error fetching AQI data:', error);
+            }
+        }
+
+        function getMainPollutant(code) {
+            switch (code) {
+                case 'p2':
+                    return 'PM2.5';
+                case 'p10':
+                    return 'PM10';
+                case 'o3':
+                    return 'O3';
+                case 'co':
+                    return 'CO';
+                case 'so2':
+                    return 'SO2';
+                case 'no2':
+                    return 'NO2';
+                default:
+                    return 'Unknown';
             }
         }
 
