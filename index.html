@@ -80,8 +80,11 @@
                 const response = await fetch(url);
                 const data = await response.json();
 
+                // Log data for debugging
+                console.log('API Response:', data);
+
                 if (data.status !== 'success') {
-                    throw new Error(data.data.message);
+                    throw new Error(data.data.message || 'Unknown error');
                 }
 
                 const aqi = data.data.current.pollution.aqius;
@@ -106,27 +109,27 @@
                 aqiElement.style.color = color;
 
                 // Display main pollutant
-                const pollutant = data.data.current.pollution.mainus; // Adjust if necessary
+                const pollutant = data.data.current.pollution.mainus || 'N/A'; // Adjust if necessary
                 const pollutantElement = document.getElementById('pollutant');
                 pollutantElement.innerText = pollutant;
 
                 // Wind Speed and Direction
-                const windSpeed = data.data.current.weather.windspeed; // Ensure key names match API response
-                const windDirection = data.data.current.weather.wind_dir; // Ensure key names match API response
+                const windSpeed = data.data.current.weather.windspeed || 'N/A'; // Ensure key names match API response
+                const windDirection = data.data.current.weather.wind_dir || 0; // Ensure key names match API response
                 document.getElementById('wind').innerText = `${windSpeed} MPH`;
                 document.getElementById('wind-dir').style.transform = `rotate(${windDirection}deg)`;
 
                 // Humidity
-                const humidity = data.data.current.weather.humidity; // Ensure key names match API response
+                const humidity = data.data.current.weather.humidity || 'N/A'; // Ensure key names match API response
                 document.getElementById('humidity').innerText = `${humidity}%`;
 
                 document.getElementById('error').innerText = '';
             } catch (error) {
+                console.error('Error fetching data:', error);
                 document.getElementById('aqi').innerText = '';
                 document.getElementById('wind').innerText = '';
                 document.getElementById('humidity').innerText = '';
                 document.getElementById('error').innerText = 'Error fetching data. Please try again later.';
-                console.error('Error fetching data:', error);
             }
         }
 
